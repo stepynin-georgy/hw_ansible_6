@@ -1,8 +1,0 @@
----
-- name: Test my module
-  hosts: localhost 
-  tasks:
-  - name: Create file
-    my_own_module:
-      path: './test_file.txt'
-      content: "This test content"
