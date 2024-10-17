@@ -209,9 +209,22 @@ if __name__ == '__main__':
 
 **Шаг 3.** Заполните файл в соответствии с требованиями Ansible так, чтобы он выполнял основную задачу: module должен создавать текстовый файл на удалённом хосте по пути, определённом в параметре `path`, с содержимым, определённым в параметре `content`.
 
+```
+{
+    "ANSIBLE_MODULE_ARGS": {
+        "path": "/opt/test.txt",
+        "content": "test message"
+    }
+}
+```
+
 **Шаг 4.** Проверьте module на исполняемость локально.
 
+![изображение](https://github.com/stepynin-georgy/hw_ansible_6/blob/main/img/Screenshot_200.png)
+
 **Шаг 5.** Напишите single task playbook и используйте module в нём.
+
+[single_task_playbook.yaml](https://github.com/stepynin-georgy/hw_ansible_6/blob/main/single_task_playbook.yaml)
 
 **Шаг 6.** Проверьте через playbook на идемпотентность.
 
@@ -242,7 +255,7 @@ localhost                  : ok=2    changed=1    unreachable=0    failed=0    s
 **Шаг 8.** Инициализируйте новую collection: `ansible-galaxy collection init my_own_namespace.yandex_cloud_elk`.
 
 ```
-(venv) root@ansible-ubuntu:/opt/hw_ansible_6/ansible# ansible-galaxy collection init my_own_namespace.yandex_cloud_elk
+root@ansible-ubuntu:/opt/hw_ansible_6/ansible# ansible-galaxy collection init my_own_namespace.yandex_cloud_elk
 [WARNING]: You are running the development version of Ansible. You should only run Ansible from "devel" if you are modifying the Ansible engine, or trying out features
 under development. This is a rapidly changing source of code and can become unstable at any point.
 - Collection my_own_namespace.yandex_cloud_elk was created successfully
@@ -251,7 +264,7 @@ under development. This is a rapidly changing source of code and can become unst
 **Шаг 9.** В эту collection перенесите свой module в соответствующую директорию.
 
 ```
-(venv) root@ansible-ubuntu:/opt/hw_ansible_6/ansible# ls -l  my_own_namespace/yandex_cloud_elk/plugins/modules
+root@ansible-ubuntu:/opt/hw_ansible_6/ansible# ls -l  my_own_namespace/yandex_cloud_elk/plugins/modules
 total 8
 -rw-r--r-- 1 root root 5075 Oct 17 14:11 my_own_module.py
 ```
@@ -259,26 +272,37 @@ total 8
 **Шаг 10.** Single task playbook преобразуйте в single task role и перенесите в collection. У role должны быть default всех параметров module.
 
 ```
-(venv) root@ansible-ubuntu:/opt/hw_ansible_6/ansible# cd my_own_namespace/yandex_cloud_elk/roles
-(venv) root@ansible-ubuntu:/opt/hw_ansible_6/ansible/my_own_namespace/yandex_cloud_elk/roles# ansible-galaxy role init my_role
+root@ansible-ubuntu:/opt/hw_ansible_6/ansible# cd my_own_namespace/yandex_cloud_elk/roles
+root@ansible-ubuntu:/opt/hw_ansible_6/ansible/my_own_namespace/yandex_cloud_elk/roles# ansible-galaxy role init my_role
 [WARNING]: You are running the development version of Ansible. You should only run Ansible from "devel" if you are modifying the Ansible engine, or trying out features
 under development. This is a rapidly changing source of code and can become unstable at any point.
 - Role my_role was created successfully
-(venv) root@ansible-ubuntu:/opt/hw_ansible_6/ansible/my_own_namespace/yandex_cloud_elk/roles#
+root@ansible-ubuntu:/opt/hw_ansible_6/ansible/my_own_namespace/yandex_cloud_elk/roles#
 ```
 
 **Шаг 11.** Создайте playbook для использования этой role.
 
+```
+---
+- name: Testing my module
+  hosts: localhost
+  gather_facts: false
+  roles: 
+    - my_role
+```
+
 **Шаг 12.** Заполните всю документацию по collection, выложите в свой репозиторий, поставьте тег `1.0.0` на этот коммит.
+
+(Репозиторий с ролью)[https://github.com/stepynin-georgy/my_own_collection/releases/tag/1.0.0]
 
 **Шаг 13.** Создайте .tar.gz этой collection: `ansible-galaxy collection build` в корневой директории collection.
 
 ```
-(venv) root@ansible-ubuntu:/opt/hw_ansible_6/ansible/my_own_namespace/yandex_cloud_elk# ansible-galaxy collection build
+root@ansible-ubuntu:/opt/hw_ansible_6/ansible/my_own_namespace/yandex_cloud_elk# ansible-galaxy collection build
 [WARNING]: You are running the development version of Ansible. You should only run Ansible from "devel" if you are modifying the Ansible engine, or trying out features
 under development. This is a rapidly changing source of code and can become unstable at any point.
 Created collection for my_own_namespace.yandex_cloud_elk at /opt/hw_ansible_6/ansible/my_own_namespace/yandex_cloud_elk/my_own_namespace-yandex_cloud_elk-1.0.0.tar.gz
-(venv) root@ansible-ubuntu:/opt/hw_ansible_6/ansible/my_own_namespace/yandex_cloud_elk#
+root@ansible-ubuntu:/opt/hw_ansible_6/ansible/my_own_namespace/yandex_cloud_elk#
 ```
 
 **Шаг 14.** Создайте ещё одну директорию любого наименования, перенесите туда single task playbook и архив c collection.
@@ -286,7 +310,7 @@ Created collection for my_own_namespace.yandex_cloud_elk at /opt/hw_ansible_6/an
 **Шаг 15.** Установите collection из локального архива: `ansible-galaxy collection install <archivename>.tar.gz`.
 
 ```
-(venv) root@ansible-ubuntu:/home/user/test# ansible-galaxy collection install my_own_namespace-yandex_cloud_elk-1.0.0.tar.gz
+root@ansible-ubuntu:/home/user/test# ansible-galaxy collection install my_own_namespace-yandex_cloud_elk-1.0.0.tar.gz
 [WARNING]: You are running the development version of Ansible. You should only run Ansible from "devel" if you are modifying the Ansible engine, or trying out features
 under development. This is a rapidly changing source of code and can become unstable at any point.
 Starting galaxy collection install process
@@ -294,14 +318,14 @@ Process install dependency map
 Starting collection install process
 Installing 'my_own_namespace.yandex_cloud_elk:1.0.0' to '/root/.ansible/collections/ansible_collections/my_own_namespace/yandex_cloud_elk'
 my_own_namespace.yandex_cloud_elk:1.0.0 was installed successfully
-(venv) root@ansible-ubuntu:/home/user/test#
+root@ansible-ubuntu:/home/user/test#
 ```
 
 **Шаг 16.** Запустите playbook, убедитесь, что он работает.
 
 ```
 my_own_namespace-yandex_cloud_elk-1.0.0.tar.gz  single_task_playbook.yaml
-(venv) root@ansible-ubuntu:/home/user/test# ansible-playbook single_task_playbook.yaml
+root@ansible-ubuntu:/home/user/test# ansible-playbook single_task_playbook.yaml
 [WARNING]: You are running the development version of Ansible. You should only run Ansible from "devel" if you are modifying the Ansible engine, or trying out features
 under development. This is a rapidly changing source of code and can become unstable at any point.
 [WARNING]: No inventory was parsed, only implicit localhost is available
@@ -318,7 +342,7 @@ changed: [localhost]
 PLAY RECAP ***************************************************************************************************************************************************************
 localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
-(venv) root@ansible-ubuntu:/home/user/test#
+root@ansible-ubuntu:/home/user/test#
 
 ```
 
